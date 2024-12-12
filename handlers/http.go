@@ -12,6 +12,9 @@ import (
 func NewRouter(logger *log.Logger) http.Handler {
 	router := http.NewServeMux()
 	router.Handle("GET /add", newHTTPHandler(logger, &calc.Addition{}))
+	router.Handle("GET /sub", newHTTPHandler(logger, &calc.Subtraction{}))
+	router.Handle("GET /mul", newHTTPHandler(logger, &calc.Multiplication{}))
+	router.Handle("GET /div", newHTTPHandler(logger, &calc.Division{}))
 	return router
 }
 
@@ -37,5 +40,8 @@ func (this *HTTPHandler) ServeHTTP(response http.ResponseWriter, request *http.R
 		return
 	}
 	c := this.calculator.Calculate(a, b)
-	_, _ = fmt.Fprint(response, c)
+	_, err = fmt.Fprint(response, c)
+	if err != nil {
+		this.logger.Println(err)
+	}
 }
