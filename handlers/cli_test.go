@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/mdw-cohort-c/calc-lib"
+	"github.com/smarty/assertions/should"
 )
 
 func assertError(t *testing.T, actual, target error) {
@@ -17,17 +18,17 @@ func assertError(t *testing.T, actual, target error) {
 func TestHandler_WrongNumberOfArguments(t *testing.T) {
 	handler := NewHandler(nil, nil)
 	err := handler.Handle(nil)
-	assertError(t, err, errWrongNumberOfArgs)
+	should.So(t, err, should.Wrap, errWrongNumberOfArgs)
 }
 func TestHandler_InvalidFirstArgument(t *testing.T) {
 	handler := NewHandler(nil, nil)
 	err := handler.Handle([]string{"INVALID", "3"})
-	assertError(t, err, errInvalidArg)
+	should.So(t, err, should.Wrap, errInvalidArg)
 }
 func TestHandler_InvalidSecondArgument(t *testing.T) {
 	handler := NewHandler(nil, nil)
 	err := handler.Handle([]string{"3", "INVALID"})
-	assertError(t, err, errInvalidArg)
+	should.So(t, err, should.Wrap, errInvalidArg)
 }
 func TestHandler_OutputWriterError(t *testing.T) {
 	boink := errors.New("boink")
@@ -36,8 +37,8 @@ func TestHandler_OutputWriterError(t *testing.T) {
 
 	err := handler.Handle([]string{"3", "4"})
 
-	assertError(t, err, boink)
-	assertError(t, err, errWriterFailure)
+	should.So(t, err, should.Wrap, boink)
+	should.So(t, err, should.Wrap, errWriterFailure)
 }
 func TestHandler_HappyPath(t *testing.T) {
 	writer := &bytes.Buffer{}
@@ -45,10 +46,8 @@ func TestHandler_HappyPath(t *testing.T) {
 
 	err := handler.Handle([]string{"3", "4"})
 
-	assertError(t, err, nil)
-	if writer.String() != "7" {
-		t.Errorf("expected 7, got %s", writer.String())
-	}
+	should.So(t, err, should.BeNil)
+	should.So(t, writer.String(), should.Equal, "7")
 }
 
 type ErringWriter struct {
